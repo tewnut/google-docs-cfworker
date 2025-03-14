@@ -1,0 +1,556 @@
+openapi: 3.1.0
+info:
+  title: Proxy for Google APIs
+  description: |
+    A proxy to simplify interactions with a wide range of Google APIs, including Google Docs, Google Drive, Google Sheets, Gmail, Google Calendar, and more. 
+    All request params, queries, and bodies follow the respective Google API specification for each of these services.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://gooproxy.wellcare.workers.dev
+security:
+  - googleOAuth: []
+components:
+  securitySchemes:
+    googleOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://gooproxy.wellcare.workers.dev/auth2/v2/auth
+          tokenUrl: https://gooproxy.wellcare.workers.dev/auth2/token
+          scopes:
+            https://www.googleapis.com/auth/drive: Full access to Google Drive
+            https://www.googleapis.com/auth/gmail.readonly: Read-only access to Gmail
+            https://www.googleapis.com/auth/gmail.send: Send email from Gmail
+            https://www.googleapis.com/auth/calendar: Full access to Google Calendar
+paths:
+  /docs/v1/documents:
+    post:
+      operationId: documents.create
+      tags: [Google Docs]
+      summary: Create a new document
+      description: |
+        Creates a blank document using the title provided in the request. 
+        Other fields in the request, including any provided content, are ignored.
+        Returns the created document.
+
+  /docs/v1/documents/{documentId}:
+    parameters:
+      - in: path
+        name: documentId
+        required: true
+        description: The ID of the document to retrieve or update.
+        schema:
+          type: string
+
+    get:
+      operationId: documents.get
+      tags: [Google Docs]
+      summary: Retrieve a document by ID
+      description: |
+        Gets the latest version of the specified document.
+
+  /docs/v1/documents/{documentId}:batchUpdate:
+    parameters:
+      - in: path
+        name: documentId
+        required: true
+        description: The ID of the document to batch update.
+        schema:
+          type: string
+
+    post:
+      operationId: documents.batchUpdate
+      tags: [Google Docs]
+      summary: Batch update a document
+      description: |
+        Applies a list of updates to the document in a single request.
+        Multiple changes can be made in a batch update.
+        Each request is validated before being applied. 
+        If any request is not valid, then the entire request will fail and nothing will be applied.
+
+  /sheets/v4/spreadsheets:
+    post:
+      operationId: spreadsheets.create
+      tags: [Google Sheets]
+      summary: Create a new spreadsheet
+      description: |
+        Creates a new blank spreadsheet with the specified title and returns the created spreadsheet.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet to retrieve or update.
+        schema:
+          type: string
+
+    get:
+      operationId: spreadsheets.get
+      tags: [Google Sheets]
+      summary: Retrieve a spreadsheet by ID
+      description: |
+        By default, data within grids is not returned. 
+        You can include grid data by specifying a field mask listing your desired fields using the fields URL parameter.
+        For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. 
+        To retrieve only subsets of spreadsheet data, use the ranges URL parameter.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}:batchUpdate:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet to batch update.
+        schema:
+          type: string
+
+    post:
+      operationId: spreadsheets.batchUpdate
+      tags: [Google Sheets]
+      summary: Batch update a spreadsheet
+      description: |
+        Applies a list of updates to the document in a single request.
+        Multiple changes can be made in a batch update.
+        Each request is validated before being applied. 
+        If any request is not valid, then the entire request will fail and nothing will be applied.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}/sheets/{sheetId}:copyTo:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet containing the sheet to copy.
+        schema:
+          type: string
+      - in: path
+        name: sheetId
+        required: true
+        description: The ID of the sheet to copy.
+        schema:
+          type: string
+
+    post:
+      operationId: spreadsheets.sheets.copyTo
+      tags: [Google Sheets]
+      summary: Copy a sheet to a new spreadsheet
+      description: |
+        Copies a single sheet from a spreadsheet to another spreadsheet. Returns the properties of the newly created sheet.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}/values:batchClear:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet to clear values from.
+        schema:
+          type: string
+
+    post:
+      operationId: spreadsheets.values.batchClear
+      tags: [Google Sheets]
+      summary: Clears one or more ranges of values from a spreadsheet.
+      description: |
+        Clears one or more ranges of values from a spreadsheet. 
+        Only values are cleared -- all other properties of the cell (such as formatting and data validation) are kept.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}/values:batchGet:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet to retrieve values from.
+        schema:
+          type: string
+
+    post:
+      operationId: spreadsheets.values.batchGet
+      tags: [Google Sheets]
+      summary: Returns one or more ranges of values from a spreadsheet.
+      description: |
+        Returns one or more ranges of values from a spreadsheet. Each range can be specified using A1 notation.
+
+  /sheets/v4/spreadsheets/{spreadsheetId}/values:batchUpdate:
+    parameters:
+      - in: path
+        name: spreadsheetId
+        required: true
+        description: The ID of the spreadsheet to update values in.
+        schema:
+          type: string
+
+    post:
+      operationId: spreadsheets.values.batchUpdate
+      tags: [Google Sheets]
+      summary: Sets values in one or more ranges of a spreadsheet.
+      description: |
+        You can modify or overwrite cell values for specific ranges. 
+        Must specify a valueInputOption, and one or more ValueRanges.
+
+  /drive/v3/files/{fileId}/comments:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file to create comments on.
+        schema:
+          type: string
+
+    post:
+      operationId: comments.create
+      tags: [Google Drive]
+      summary: Create a comment on a file
+      description: |
+        Creates a comment on a file. The fields parameter must be set. To return the exact fields you need
+
+    get:
+      operationId: comments.list
+      tags: [Google Drive]
+      summary: List a file's comments
+      description: |
+        Lists all comments on a file. The fields parameter must be set
+
+  /drive/v3/files/{fileId}/comments/{commentId}:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file that the comment belongs to.
+        schema:
+          type: string
+      - in: path
+        name: commentId
+        required: true
+        description: The ID of the comment to retrieve, delete, or update.
+        schema:
+          type: string
+
+    get:
+      operationId: comments.get 
+      tags: [Google Drive]
+      summary: Get a comment by ID
+      description: |
+        Retrieves a comment by its unique comment ID. The fields parameter must be set. 
+
+    delete:
+      operationId: comments.delete
+      tags: [Google Drive]
+      summary: Delete a comment
+      description: |
+        Deletes a comment on a file. The fields parameter must be set. 
+
+    patch:
+      operationId: comments.update
+      tags: [Google Drive]
+      summary: Update a comment
+      description: |
+        Updates a comment with patch semantics.
+
+  /drive/v3/files/{fileId}/copy:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file to copy.
+        schema:
+          type: string
+
+    post:
+      operationId: files.copy
+      tags: [Google Drive]
+      summary: Create a copy of a file
+      description: |
+        Creates a copy of a file and applies any requested updates with patch semantics.
+
+  /drive/v3/files:
+    post:
+      operationId: files.create
+      tags: [Google Drive]
+      summary: Create a new file in Google Drive
+      description: |
+        Creates a new file in Google Drive with the provided file metadata and returns the file object.
+        Specify a valid MIME type. 
+        Specify a file extension in the name property when inserting files with the API
+
+  /drive/v3/files/{fileId}:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file to retrieve, update, or delete.
+        schema:
+          type: string
+
+    get:
+      operationId: files.get
+      tags: [Google Drive]
+      summary: Get a file's metadata or content by ID
+      description: |
+        Retrieves a file's metadata or content by its unique file ID.
+        If you provide the URL parameter alt=media, then the response includes the file contents in the response body
+
+    delete:
+      operationId: files.delete
+      tags: [Google Drive]
+      summary: Permanently delete a file
+      description: |
+        Permanently deletes a file owned by the user without moving it to the trash.
+        If the target is a folder, all descendants owned by the user are also deleted.
+
+    patch:
+      operationId: files.update
+      tags: [Google Drive]
+      summary: Update a file's metadata and/or content
+      description: |
+        Updates a file's metadata and/or content. 
+        Only populate fields in the request that you want to modify. 
+        This method supports patch semantics.
+
+  /drive/v3/files/{fileId}/comments/{commentId}/replies:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file containing the comment to reply to.
+        schema:
+          type: string
+      - in: path
+        name: commentId
+        required: true
+        description: The ID of the comment to reply to.
+        schema:
+          type: string
+
+    post:
+      operationId: replies.create
+      tags: [Google Drive]
+      summary: Creates a reply to a comment on a file.
+
+    get: 
+      operationId: replies.list
+      tags: [Google Drive]
+      summary: Lists a comment's replies.
+
+  /drive/v3/files/{fileId}/comments/{commentId}/replies/{replyId}:
+    parameters:
+      - in: path
+        name: fileId
+        required: true
+        description: The ID of the file containing the comment and reply.
+        schema:
+          type: string
+      - in: path
+        name: commentId
+        required: true
+        description: The ID of the comment to which the reply belongs.
+        schema:
+          type: string
+      - in: path
+        name: replyId
+        required: true
+        description: The ID of the reply to retrieve, delete, or update.
+        schema:
+          type: string
+
+    get:
+      operationId: replies.get 
+      tags: [Google Drive]
+      summary: Retrieves a reply by its unique reply ID.
+        
+
+    delete:
+      operationId: replies.delete
+      tags: [Google Drive]
+      summary: Deletes a reply to a comment.
+        
+
+    patch:
+      operationId: replies.update
+      tags: [Google Drive]
+      summary:  Update a reply with patch semantics
+
+  /calendar/v3/calendars/primary/events:
+    post:
+      operationId: calendar.events.insert
+      tags: [Google Calendar]
+      summary: Create a new event in Google Calendar
+      description: |
+        Creates a new event in the primary calendar and returns the event details.
+    get: 
+      operationId: calendar.events.list
+      tags: [Google Calendar]
+      summary: Retrieve a list of events from primary calendar
+
+  /calendar/v3/calendars/primary/events/{eventId}:
+    parameters:
+      - in: path
+        name: eventId
+        required: true
+        description: The ID of the event to retrieve or update.
+        schema:
+          type: string
+
+    get:
+      operationId: calendar.events.get
+      tags: [Google Calendar]
+      summary: Retrieve an event by ID from Google Calendar
+      description: |
+        Retrieves an event from Google Calendar using its unique event ID.
+
+    patch:
+      operationId: calendar.events.patch
+      tags: [Google Calendar]
+      summary: Update an event in Google Calendar by ID
+      description: |
+        Updates an event. This method supports patch semantics. 
+        Note that each patch request consumes three quota units; prefer using a get followed by an update. 
+        The field values you specify replace the existing values. Fields that you don't specify in the request remain unchanged. 
+        Array fields, if specified, overwrite the existing arrays; this discards any previous array elements.
+
+  /gmail/v1/users/{userId}/messages/{id}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        description: The ID of the message to retrieve.
+        schema:
+          type: string
+
+    get:
+      operationId: gmail.users.messages.get
+      tags: [Gmail]
+      summary: Get the specified message
+      description: |
+        Retrieves the specified message from the user's mailbox.
+
+  /gmail/v1/users/{userId}/messages:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+
+    get:
+      operationId: gmail.users.messages.list
+      tags: [Gmail]
+      summary: List the messages in the user's mailbox
+      description: |
+        Lists the messages in the user's mailbox, with options for pagination.
+
+  /gmail/v1/users/{userId}/messages/send:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+
+    post:
+      operationId: gmail.users.messages.send
+      tags: [Gmail]
+      summary: Send the specified message
+      description: |
+        Sends the specified message to the recipients in the To, Cc, and Bcc headers.
+
+  # Gmail - Drafts
+  /gmail/v1/users/{userId}/drafts:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+
+    post:
+      operationId: gmail.users.drafts.create
+      tags: [Gmail]
+      summary: Create a new draft
+      description: |
+        Creates a new draft with the DRAFT label. You can specify the email content and recipients.
+
+  /gmail/v1/users/{userId}/drafts/{id}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        description: The ID of the draft to retrieve, update, or delete.
+        schema:
+          type: string
+
+    get:
+      operationId: gmail.users.drafts.get
+      tags: [Gmail]
+      summary: Get the specified draft
+      description: |
+        Retrieves the specified draft from the user's mailbox.
+
+    delete:
+      operationId: gmail.users.drafts.delete
+      tags: [Gmail]
+      summary: Delete a draft
+      description: |
+        Immediately and permanently deletes the specified draft.
+
+    put:
+      operationId: gmail.users.drafts.update
+      tags: [Gmail]
+      summary: Replace a draft's content
+      description: |
+        Replaces the content of an existing draft.
+
+  /gmail/v1/users/{userId}/drafts/send:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+
+    post:
+      operationId: gmail.users.drafts.send
+      tags: [Gmail]
+      summary: Send the specified draft
+      description: |
+        Sends the specified, existing draft to the recipients in the To, Cc, and Bcc headers.
+
+  /gmail/v1/users/{userId}/settings/vacation:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        description: The email address of the user. Use "me" to indicate the authenticated user.
+        schema:
+          type: string
+
+    get:
+      operationId: gmail.users.settings.getVacation
+      tags: [Gmail]
+      summary: Get vacation responder settings
+      description: |
+        Retrieves the current vacation responder settings for the user.
+
+    put:
+      operationId: gmail.users.settings.updateVacation
+      tags: [Gmail]
+      summary: Update vacation responder settings
+      description: |
+        Updates the vacation responder settings, including the on/off status, subject, and message body.        

@@ -1,0 +1,35 @@
+{
+  "name": "gooproxy",
+  "scripts": {
+    "test": "jest",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "hono": "^4.7.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250311.0",
+    "@readme/openapi-parser": "^3.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.10",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6",
+    "typescript": "^5.8.2",
+    "wrangler": "^3.114.1",
+    "yaml": "^2.7.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "testEnvironment": "node"
+  }
+}

@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: Google Slides API
+  description: API for managing Google Slides presentations
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /v1/presentations/{presentationId}:
+    get:
+      summary: Get Presentation Metadata
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: The ID of the presentation
+      responses:
+        '200':
+          description: Presentation metadata retrieved successfully
+        '404':
+          description: Presentation not found
+  /v1/presentations:
+    post:
+      summary: Create a New Presentation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the presentation
+      responses:
+        '201':
+          description: Presentation created successfully
+        '400':
+          description: Invalid request
+  /v1/presentations/{presentationId}:batchUpdate:
+    post:
+      summary: Apply Updates to a Presentation
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: The ID of the presentation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requests:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Presentation updated successfully
+        '404':
+          description: Presentation not found
+        '400':
+          description: Invalid request
+  /v1/presentations/{presentationId}/pages/{pageObjectId}:
+    get:
+      summary: Get a Specific Page
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: The ID of the presentation
+        - name: pageObjectId
+          in: path
+          required: true
+          description: The ID of the page
+      responses:
+        '200':
+          description: Page retrieved successfully
+        '404':
+          description: Page not found
+  /v1/presentations/{presentationId}/pages/{pageObjectId}/thumbnail:
+    get:
+      summary: Get Thumbnail of a Page
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: The ID of the presentation
+        - name: pageObjectId
+          in: path
+          required: true
+          description: The ID of the page
+      responses:
+        '200':
+          description: Thumbnail URL retrieved successfully
+        '404':
+          description: Page not found
