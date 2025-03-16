@@ -10,6 +10,8 @@ export async function forwardToken(c: any) {
   const tokenUrl = new URL("https://oauth2.googleapis.com/token");
   const body = await c.req.text();
   const clientSecret = c.env.GOOGLE_CLIENT_SECRET; // Fetch from environment variable
+  if (!clientSecret)
+    return c.json({ error: "GOOGLE_CLIENT_SECRET is not set" }, 500);
   const bodyWithClientSecret = `${body}&client_secret=${encodeURIComponent(
     clientSecret
   )}`;
