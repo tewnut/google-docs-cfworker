@@ -10,7 +10,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://docs.wellcare.workers.dev
+  - url: http://127.0.0.1:8787
 security:
   - googleOAuth: []
 components:
@@ -19,8 +19,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://docs.wellcare.workers.dev/auth2/v2/auth
-          tokenUrl: https://docs.wellcare.workers.dev/auth2/token
+          authorizationUrl: http://127.0.0.1:8787/auth2/v2/auth
+          tokenUrl: http://127.0.0.1:8787/auth2/token
           scopes:
             https://www.googleapis.com/auth/drive: Full access to Google Drive
   schemas: {}
@@ -41,7 +41,13 @@ paths:
           schema:
             type: string
           example: "1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4"
-
+      responses:
+        "200":
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: object
   /v1/documents/{documentId}/batchUpdate:
     post:
       operationId: batchUpdateDocument
@@ -58,7 +64,7 @@ paths:
           description: The ID of the document to apply the batch updates to.
           schema:
             type: string
-            example: "1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4"
+            example: "1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4"            
       requestBody:
         description: |
           The request body should contain a list of update requests in the Google Docs API batch update format.
@@ -80,3 +86,10 @@ paths:
                       text: "Hello, world!"
                       location:
                         index: 1
+      responses:
+        "200":
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: object

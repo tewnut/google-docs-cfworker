@@ -1,20 +1,24 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/cloudflare-workers";
-import { forwardLogin, forwardToken } from "./auth";
+import { forwardLogin, forwardToken, handleCallback } from "./auth";
 import docs from "./docs/routes";
-
+import { ui } from "./openapi/swagger-ui";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 // Root endpoint
-app.get("/", (c) => c.text("Hi, This is Google API Proxy for ChatAgents!"));
+app.get("/", (c) => c.redirect("/docs"));
 
 // AUTHENTICATION ROUTES
 app.get("/auth2/v2/auth", (c) => forwardLogin(c));
 app.post("/auth2/token", (c) => forwardToken(c));
+app.get("/oauth2-redirect.html", (c) => handleCallback(c));
 
 // Mount the subroutes using app.routex
 app.route("/v1", docs);
+
+// Swagger UI route
+app.get("/docs", ui);
 
 // Static files route
 app.all("/public/*", async (c, next) => {

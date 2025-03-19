@@ -1,6 +1,8 @@
 // src/docs/routes.ts
 import { Hono } from "hono";
-import { forward, batchUpdate } from "./handlers";
+import { forward } from "./apis/forward";
+import { batchUpdate } from "./apis/batch-update";
+
 
 const app = new Hono();
 

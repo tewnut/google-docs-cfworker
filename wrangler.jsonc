@@ -40,7 +40,7 @@
   "assets": {
     "directory": "./public", // Path to the static assets directory
     "binding": "STATIC_MANIFEST" // Binding name for the assets
-  },
+  }
 
   /**
    * Service Bindings (communicate between multiple Workers)
