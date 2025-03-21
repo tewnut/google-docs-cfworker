@@ -80,3 +80,36 @@ paths:
                       text: Hello, world!
                       location:
                         index: 1
+
+  /v1/documents/{documentId}/markdown/insert:
+    post:
+      operationId: documents_markdown_insert
+      summary: Insert a markdown content to Google Docs
+      description: |
+        Insert a markdown content to Google Docs. 
+        If user provide document link, please extract the documentId from it.
+        The request body should contain a text/markdown.
+      parameters:
+        - in: path
+          name: documentId
+          required: true
+          description: The ID of the document to apply the batch updates to.
+          schema:
+            type: string
+          example: 1Q9pDyZsea-7wQAtJGD2XUu-skcDrg3Xz4Sev0atnGVw
+      requestBody:
+        description: |
+          The request body should contain a list of update requests in the Google Docs API batch update format.
+          Valid requests will be applied sequentially. If any update is invalid, the entire batch fails.
+        content:
+          text/markdown:
+            schema:
+              type: string
+            
+      responses:
+        "200":
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: object

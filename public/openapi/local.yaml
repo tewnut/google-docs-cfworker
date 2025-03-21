@@ -93,8 +93,9 @@ paths:
       operationId: documents_markdown_insert
       summary: Convert markdown to Google Docs format and apply batch update
       description: |
-        Converts markdown to Google Docs format and applies batch update.
+        Insert a markdown content to Google Docs. 
         If user provide document link, please extract the documentId from it.
+        The request body should contain a text/markdown.
       parameters:
         - in: path
           name: documentId
