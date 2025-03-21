@@ -105,11 +105,3 @@ paths:
           text/markdown:
             schema:
               type: string
-            
-      responses:
-        "200":
-          description: A successful response
-          content:
-            application/json:
-              schema:
-                type: object
