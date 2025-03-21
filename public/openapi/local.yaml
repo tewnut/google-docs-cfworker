@@ -1,16 +1,15 @@
 openapi: 3.1.0
 info:
   title: Proxy for Google Docs API
-  description: |
+  description: >
     This is a Google Docs API proxy that contains tools for agent to retrieve and apply batch updates to Google Docs documents. 
-    All request parameters, query parameters, and bodies will be passed through and forwarded to the Google Docs API directly, 
-    adhering strictly to the Google Docs API specification.
+    All request parameters, query parameters, and bodies will be passed through and forwarded to the Google Docs API directly, adhering strictly to the Google Docs API specification.
   version: 1.0.0
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://docs.wellcare.workers.dev
+  - url: http://127.0.0.1:8787
 security:
   - googleOAuth: []
 components:
@@ -19,15 +18,15 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://docs.wellcare.workers.dev/auth2/v2/auth
-          tokenUrl: https://docs.wellcare.workers.dev/auth2/token
+          authorizationUrl: http://127.0.0.1:8787/auth2/v2/auth
+          tokenUrl: http://127.0.0.1:8787/auth2/token
           scopes:
             https://www.googleapis.com/auth/drive: Full access to Google Drive
   schemas: {}
 paths:
   /v1/documents/{documentId}:
     get:
-      operationId: getDocument
+      operationId: documents_get
       summary: Retrieve a Google Docs document by ID
       description: |
         Retrieves the most recent version of the specified document based on the document ID.
@@ -40,17 +39,16 @@ paths:
           description: The ID of the document to retrieve.
           schema:
             type: string
-          example: "1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4"
-
+          example: 1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4
+        
   /v1/documents/{documentId}/batchUpdate:
     post:
-      operationId: batchUpdateDocument
+      operationId: documents_batchUpdate
       summary: Apply multiple updates to a Google Docs document
       description: |
         Applies multiple updates to a Google Docs document in a single action. 
         If user provide document link, please extract the documentId from it.
-        If any update is invalid, the entire batch fails.
-        It must follows strictly Google Docs API specs
+        For markdown format, you must convert to Google Docs format first.
       parameters:
         - in: path
           name: documentId
@@ -58,11 +56,11 @@ paths:
           description: The ID of the document to apply the batch updates to.
           schema:
             type: string
-            example: "1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4"
+            example: 1Q9pDyZsea-7wQAtJGD2XUu-skcDrg3Xz4Sev0atnGVw
       requestBody:
         description: |
           The request body should contain a list of update requests in the Google Docs API batch update format.
-          Valid requests will be applied sequentially.
+          Valid requests will be applied sequentially. If any update is invalid, the entire batch fails.
         content:
           application/json:
             schema:
@@ -77,6 +75,13 @@ paths:
               example:
                 requests:
                   - insertText:
-                      text: "Hello, world!"
+                      text: Hello, world!
                       location:
                         index: 1
+      responses:
+        "200":
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: object

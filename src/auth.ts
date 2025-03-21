@@ -1,3 +1,5 @@
+import { getCookie, setCookie, deleteCookie } from "hono/cookie";
+
 // Function to forward query parameters to Google OAuth
 export function forwardLogin(c: any) {
   const oauthUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
@@ -5,11 +7,12 @@ export function forwardLogin(c: any) {
   // Get existing query parameters
   const params = new URLSearchParams(c.req.query());
   
+  
   // Ensure required parameters are set
   if (!params.has('client_id') && c.env.GOOGLE_CLIENT_ID) {
     params.set('client_id', c.env.GOOGLE_CLIENT_ID);
   }
-  
+
   if (!params.has('redirect_uri')) {
     params.set('redirect_uri', `${new URL(c.req.url).origin}/oauth2-redirect.html`);
   }
@@ -32,6 +35,7 @@ export function forwardLogin(c: any) {
   }
   
   oauthUrl.search = params.toString();
+  console.log(oauthUrl.toString())
   return c.redirect(oauthUrl.toString());
 }
 
@@ -71,14 +75,17 @@ export async function forwardToken(c: any) {
 export async function handleCallback(c: any) {
   const code = c.req.query('code');
   const error = c.req.query('error');
+  
+  // Get the redirect path from cookie or use default
+  const redirectPath = getCookie(c, 'oauth_redirect_path') || '/swagger/public.yaml';
 
   if (error) {
     console.error(error)
-    return c.redirect(`/docs?error=${encodeURIComponent(error)}`);
+    return c.redirect(`${redirectPath}?error=${encodeURIComponent(error)}`);
   }
 
   if (!code) {
-    return c.redirect('/docs?error=No authorization code received');
+    return c.redirect(`${redirectPath}?error=No authorization code received`);
   }
 
   // Exchange the code for tokens
@@ -89,7 +96,7 @@ export async function handleCallback(c: any) {
 
 
   if (!clientId || !clientSecret) {
-    return c.redirect('/docs?error=Missing OAuth credentials');
+    return c.redirect(`${redirectPath}?error=Missing OAuth credentials`);
   }
 
   const tokenResponse = await fetch(tokenUrl.toString(), {
@@ -101,7 +108,7 @@ export async function handleCallback(c: any) {
       code,
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uri: `${new URL(c.req.url).origin}/oauth2-redirect.html`,
+      redirect_uri: `${new URL(c.req.url).origin}/swagger/oauth2-redirect.html`,
       grant_type: 'authorization_code',
     }),
   });
@@ -109,11 +116,14 @@ export async function handleCallback(c: any) {
   if (!tokenResponse.ok) {
     const errorData = await tokenResponse.json();
     console.error(JSON.stringify(errorData))
-    return c.redirect(`/docs?error=${encodeURIComponent(JSON.stringify(errorData))}`);
+    return c.redirect(`${redirectPath}?error=${encodeURIComponent(JSON.stringify(errorData))}`);
   }
 
   const tokens = await tokenResponse.json();
 
-  // Redirect back to docs with the access token
-  return c.redirect(`/docs?access_token=${encodeURIComponent((tokens as any).access_token)}`);
+  // // Clear the cookie after use
+  deleteCookie(c, 'oauth_redirect_path', { path: '/' });
+
+  // Redirect back with the access token
+  return c.redirect(`${redirectPath}?access_token=${encodeURIComponent((tokens as any).access_token)}`);
 }

@@ -7,18 +7,18 @@ import { ui } from "./openapi/swagger-ui";
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 // Root endpoint
-app.get("/", (c) => c.redirect("/docs"));
+app.get("/", (c) => c.redirect("/swagger/public.yaml"));
 
 // AUTHENTICATION ROUTES
 app.get("/auth2/v2/auth", (c) => forwardLogin(c));
 app.post("/auth2/token", (c) => forwardToken(c));
-app.get("/oauth2-redirect.html", (c) => handleCallback(c));
+app.get("/swagger/oauth2-redirect.html", (c) => handleCallback(c));
 
 // Mount the subroutes using app.routex
 app.route("/v1", docs);
 
 // Swagger UI route
-app.get("/docs", ui);
+app.get("/swagger/:spec", ui);
 
 // Static files route
 app.all("/public/*", async (c, next) => {
