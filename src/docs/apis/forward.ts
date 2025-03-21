@@ -5,7 +5,7 @@ export const SERVICE_ENDPOINT = "https://docs.googleapis.com";
 export const forward = async (
     c: Context,
     next?: () => Promise<unknown>,
-    option?: { url: string, method?: string }
+    option?: { url: string, method?: string, body?: any }
 ) => {
 
     // Remove the first segment of the path (e.g. '/drive' from '/drive/v3/files')
@@ -31,6 +31,10 @@ export const forward = async (
         } catch (error) {
             body = undefined; // If parsing fails or no body, set body to undefined
         }
+    }
+
+    if (option?.body) {
+        body = option.body;
     }
 
     const requestOptions: RequestInit = {

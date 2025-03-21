@@ -65,13 +65,15 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
+              properties:                 
                 requests:
                   type: array
                   items:
                     type: object
-                    description: A single update request, such as inserting text or formatting.
+                    description: A single update request, such as inserting text or formatting. Follow strictly Google Docs API specs.
                     properties: {}
+              required: 
+                - requests
               example:
                 requests:
                   - insertText:
