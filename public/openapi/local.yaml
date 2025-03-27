@@ -24,22 +24,28 @@ components:
             https://www.googleapis.com/auth/drive: Full access to Google Drive
   schemas: {}
 paths:
-  /v1/documents/{documentId}:
+  /v1/documents/{documentId}/structure:
     get:
-      operationId: documents_get
-      summary: Retrieve a Google Docs document by ID
+      operationId: documents_structure
+      summary: Inspect the structure of a Google Docs document.
       description: |
-        Retrieves the most recent version of the specified document based on the document ID.
-        The response includes the document's content and metadata.
-        If user provide document link, please extract the documentId from it.
+        Inspect the document’s structure before applying any updates or changes.
+        The response includes both the document's content, styles and other metadata, which can be large. 
       parameters:
         - in: path
           name: documentId
           required: true
-          description: The ID of the document to retrieve.
+          description: The ID of the document to retrieve. If user provide document link, please extract the documentId from it.
           schema:
             type: string
           example: 1s0gTYKvaqW7VHoSQg53Mu43KmA4im0mPGEoReAsmbO4
+      responses:
+        "200":
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: object
         
   /v1/documents/{documentId}/batchUpdate:
     post:
@@ -90,12 +96,14 @@ paths:
 
   /v1/documents/{documentId}/markdown/insert:
     post:
+      tags:
+        - Document
       operationId: documents_markdown_insert
-      summary: Convert markdown to Google Docs format and apply batch update
+      summary: Insert a markdown content to Google Docs
       description: |
         Insert a markdown content to Google Docs. 
         If user provide document link, please extract the documentId from it.
-        The request body should contain a text/markdown.
+        The request body should contain a markdown content in base64 encoding.
       parameters:
         - in: path
           name: documentId
@@ -105,16 +113,18 @@ paths:
             type: string
           example: 1Q9pDyZsea-7wQAtJGD2XUu-skcDrg3Xz4Sev0atnGVw
       requestBody:
-        description: |
-          The request body should contain a list of update requests in the Google Docs API batch update format.
-          Valid requests will be applied sequentially. If any update is invalid, the entire batch fails.
+        description: The request body must contain the base64 encoded markdown content.
         content:
-          text/markdown:
+          application/json:
             schema:
-              type: string
-            example:
-              |
-           
+              type: object
+              properties:
+                markdown:
+                  type: string
+                  description: The markdown content to insert, must be base64-encoded to avoid special characters issues.
+                  example: IyBIZWxsbywgd29ybGQh
+              required: [markdown]
+              
       responses:
         "200":
           description: A successful response
