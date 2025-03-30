@@ -111,3 +111,46 @@ paths:
                   example: IyBIZWxsbywgd29ybGQh
               required: [markdown]
                       
+  /v1/documents/{documentId}/deleteContentRangeRequest:
+    post:
+      operationId: documents_deleteContentRangeRequest
+      summary: Deletes content from the Google Docs document
+      description: |
+        Clear the content of a Google Docs document in the specified range.
+        It will clear all content if range is not provided.
+      parameters:
+        - in: path
+          name: documentId
+          required: true
+          description: The ID of the document to clear content. If user provide document link, please extract the documentId from it.
+          schema:
+            type: string  
+      requestBody:
+        description: The request body should contain the range to clear.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                range:
+                  type: object
+                  description: Specifies a contiguous range of text, follow Range specification in Google Docs API.
+                  properties:
+                    startIndex:
+                      type: integer
+                      description: The start index of the range to clear, default to 1.
+                      minimum: 1
+                      default: 1
+                    endIndex:
+                      type: integer
+                      description: The end index of the range to clear, default to the end of the document.
+                      example: 100
+                    segmentId:
+                      type: string
+                      description: The ID of the header, footer, or footnote that this range is contained in. An empty segment ID signifies the document's body.
+                    tabId:
+                      type: string
+                      description: The tab that contains this range. When omitted, the request applies to the first tab.
+              required: [range]
+              example:
+                range: { startIndex: 1, endIndex: 100 }

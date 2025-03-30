@@ -22,29 +22,29 @@ export const forward = async (
         `${SERVICE_ENDPOINT}/v1${path}${queryParams ? `?${queryParams}` : ""}`;
 
     const headers = c.req.header();
-
+    const method = (option?.method || c.req.method).toUpperCase();
     let body;
 
-    if (["POST", "PATCH", "PUT"].includes(c.req.method.toUpperCase())) {
+    if (["POST", "PATCH", "PUT"].includes(method)) {
         try {
             body = await c.req.json(); // Try to parse JSON only if there is a body
         } catch (error) {
             body = undefined; // If parsing fails or no body, set body to undefined
         }
     }
-
     if (option?.body) {
         body = option.body;
     }
+    if (["GET", "HEAD"].includes(method)) {
+        body = undefined;
+    }
 
     const requestOptions: RequestInit = {
-        method: option?.method || c.req.method, 
-        headers: headers,  
+        method,
+        headers: headers,
         body: body ? JSON.stringify(body) : undefined,
     };
-
     try {
-        console.log(`${c.req.method}: ${url}`, requestOptions);
         const response = await fetch(url, requestOptions);
 
         const contentType = response.headers.get('content-type');
